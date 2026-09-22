@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Masab Ashraf Portfolio"
+description = "A polished personal portfolio for Masab Ashraf, a full-stack software engineer in Lahore, featuring project case studies, experience, skills, services, development process, and contact routes."
+version = "1.0.0"
+id = "artifacts/masab-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25148
+
+[services.development]
+run = "pnpm --filter @workspace/masab-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/masab-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/masab-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25148"
+BASE_PATH = "/"
