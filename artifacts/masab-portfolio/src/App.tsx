@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ArrowRight, ArrowUpRight, BarChart3, Bug, Check, Code2, Copy, ExternalLink, Github, Lightbulb, Linkedin, Mail, Menu, Palette, Rocket, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BarChart3, Bug, Check, Code2, Copy, ExternalLink, Github, Lightbulb, Linkedin, Mail, Menu, Moon, Palette, Rocket, Sun, X } from 'lucide-react';
 import { Link, Route, Switch, useLocation, useParams, Router as WouterRouter } from 'wouter';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,7 +31,16 @@ function Reveal({ children, className = '' }: { children: ReactNode; className?:
 function Header() {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    return window.localStorage.getItem('masab-theme') === 'light' ? 'light' : 'dark';
+  });
   const closeMenu = () => setMenuOpen(false);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('masab-theme', theme);
+  }, [theme]);
+  const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
   const links = [
     { href: '/#work', label: 'Work' },
     { href: '/#experience', label: 'Experience' },
@@ -48,6 +57,10 @@ function Header() {
         <nav className="nav-links" aria-label="Primary navigation">
           {links.map((link) => <Link key={link.href} href={link.href} className={location === link.href ? 'active' : ''} data-testid={`link-nav-${link.label.toLowerCase()}`}>{link.label}</Link>)}
         </nav>
+        <button type="button" className="theme-toggle desktop-theme" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} data-testid="button-theme-toggle">
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+        </button>
         <Link href="/services" className="nav-cta" data-testid="link-services">Services <ArrowUpRight size={13} /></Link>
         <button type="button" className="mobile-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} data-testid="button-mobile-menu">
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -56,6 +69,10 @@ function Header() {
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         {links.map((link) => <Link key={link.href} href={link.href} onClick={closeMenu} data-testid={`link-mobile-${link.label.toLowerCase()}`}>{link.label}</Link>)}
         <Link href="/services" onClick={closeMenu} data-testid="link-mobile-services">Services <ArrowUpRight size={13} /></Link>
+        <button type="button" className="theme-toggle mobile-theme" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} data-testid="button-mobile-theme-toggle">
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          <span>Switch to {theme === 'dark' ? 'light' : 'dark'} theme</span>
+        </button>
       </div>
     </header>
   );
